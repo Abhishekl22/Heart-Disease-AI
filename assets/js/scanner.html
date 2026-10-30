@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;background:transparent;font-family:'Poppins',system-ui,sans-serif;overflow:hidden}
+.wrap{position:relative;height:100vh;border-radius:24px;background:radial-gradient(circle at 50% 30%,#10394a,#06202c 70%);color:#d9faff;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 20px 60px rgba(6,60,80,.35)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,230,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,255,.07) 1px,transparent 1px);background-size:34px 34px;animation:gm 4s linear infinite}
+@keyframes gm{to{background-position:0 34px,34px 0}}
+.stage{position:relative;width:210px;height:210px;perspective:700px}
+.ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(0,230,255,.55);border-top-color:transparent;border-bottom-color:transparent;animation:spin 2.2s linear infinite;transform-style:preserve-3d}
+.ring.r2{inset:16px;border-color:rgba(255,90,120,.7);border-left-color:transparent;border-right-color:transparent;animation-duration:1.5s;animation-direction:reverse}
+.ring.r3{inset:-18px;border-style:dashed;border-color:rgba(0,230,255,.3);animation-duration:6s}
+@keyframes spin{to{transform:rotateZ(360deg)}}
+svg.heart{position:absolute;inset:38px;width:134px;height:134px;filter:drop-shadow(0 0 14px #ff4d6d);animation:beat .85s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.14)}30%{transform:scale(1)}45%{transform:scale(1.08)}}
+.beam{position:absolute;left:-10px;right:-10px;height:3px;background:linear-gradient(90deg,transparent,#00e6ff,transparent);box-shadow:0 0 18px 6px rgba(0,230,255,.7);animation:sc 1.6s ease-in-out infinite alternate;border-radius:3px}
+@keyframes sc{from{top:12%}to{top:88%}}
+.ecg{width:78%;max-width:520px;height:70px;margin-top:22px}
+.ecg path{fill:none;stroke:#39ff9c;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:600;stroke-dashoffset:600;animation:dr 1.8s linear infinite;filter:drop-shadow(0 0 6px #39ff9c)}
+@keyframes dr{to{stroke-dashoffset:-600}}
+.status{margin-top:14px;font-size:15px;letter-spacing:.4px;min-height:22px;font-weight:500}
+.bar{width:68%;max-width:420px;height:8px;border-radius:8px;background:rgba(255,255,255,.12);margin-top:14px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#00e6ff,#39ff9c);border-radius:8px;box-shadow:0 0 12px #00e6ff}
+.pct{font-size:12px;opacity:.7;margin-top:6px;font-family:ui-monospace,monospace}
+.hex{position:absolute;font-family:ui-monospace,monospace;font-size:11px;color:rgba(0,230,255,.35);white-space:nowrap}
+</style></head><body><div class="wrap"><div class="grid"></div>
+<div class="hex" style="top:8%;left:5%" id="h1"></div><div class="hex" style="bottom:8%;right:5%" id="h2"></div>
+<div class="stage"><div class="ring r3"></div><div class="ring"></div><div class="ring r2"></div>
+<svg class="heart" viewBox="0 0 24 24"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a93"/><stop offset="1" stop-color="#e0153f"/></linearGradient></defs><path fill="url(#hg)" d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 2.7 4.5 6.4 4.5c2.1 0 3.8 1.1 5.6 3.2 1.8-2.1 3.5-3.2 5.6-3.2 3.700 0 5.600 3.800 4 7.300C19.500 16.400 12 21 12 21z"/></svg>
+<div class="beam"></div></div>
+<svg class="ecg" viewBox="0 0 600 70"><path d="M0 38h120l14-4 12 4h40l12-30 14 60 14-50 10 20h70l14-6 14 6h60l12-30 14 60 14-50 10 20h110"/></svg>
+<div class="status" id="st">Initialising AI engine…</div>
+<div class="bar"><i id="bar"></i></div><div class="pct" id="pct">0%</div></div>
+<script>
+const steps=["Reading patient vitals…","Analysing cardiac rhythm & ECG…","Evaluating cholesterol & blood pressure…","Running machine-learning model…","Calculating personal risk score…","Preparing your health report…"];
+
+const t0=performance.now(),st=document.getElementById('st'),bar=document.getElementById('bar'),pct=document.getElementById('pct');
+function hx(n){let s='';for(let i=0;i<n;i++)s+=Math.floor(Math.random()*256).toString(16).padStart(2,'0')+' ';return s}
+setInterval(()=>{h1.textContent=hx(8);h2.textContent=hx(8)},120);
+(function f(now){const p=Math.min(1,(now-t0)/%MS%);bar.style.width=(p*100)+'%';pct.textContent=Math.round(p*100)+'%';
+st.textContent=steps[Math.min(steps.length-1,Math.floor(p*steps.length))];if(p<1)requestAnimationFrame(f)})(t0);
+</script></body></html>

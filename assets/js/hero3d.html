@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-family:'Poppins',system-ui,sans-serif}
+canvas{width:100%;height:100%;display:block}
+.chip{position:absolute;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border:1px solid rgba(10,165,184,.2);border-radius:14px;padding:8px 14px;font-size:13px;color:#0b3b4a;font-weight:600;box-shadow:0 10px 30px rgba(10,100,120,.15);animation:fl 5s ease-in-out infinite}
+.chip small{display:block;font-weight:500;color:#5b7c88;font-size:11px}
+.c1{top:12%;left:4%}.c2{bottom:16%;right:2%;animation-delay:-2s}.c3{top:44%;right:0;animation-delay:-3.5s}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+</style></head><body>
+<canvas id="c"></canvas>
+<div class="chip c1">❤️ <span id="bpm">72</span> BPM<small>Live pulse</small></div>
+<div class="chip c2">🛡️ 91% AUC<small>ML accuracy</small></div>
+<div class="chip c3">🩺 13 vitals<small>analysed</small></div>
+<script>
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');let W,H,D=window.devicePixelRatio||1;
+function rs(){W=cv.clientWidth;H=cv.clientHeight;cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0)}rs();addEventListener('resize',rs);
+const P=[];
+for(let i=0;i<2600;i++){
+  const t=Math.random()*Math.PI*2,s=Math.random()*2-1;
+  const k=Math.sqrt(1-s*s)*(0.55+0.45*Math.random());          // fill volume
+  const x=16*Math.pow(Math.sin(t),3);
+  const y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);
+  P.push({x:x*k,y:-y*k+1,z:s*7*Math.sqrt(1-Math.abs(x)/18),h:Math.random()});
+}
+let mx=0,my=0;addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5);my=(e.clientY/innerHeight-.5)});
+let ang=0,t0=performance.now();
+function frame(now){
+  const t=(now-t0)/1000;ctx.clearRect(0,0,W,H);
+  ang+=0.008;const beat=1+0.06*Math.pow(Math.max(0,Math.sin(t*4.2)),8)+0.03*Math.pow(Math.max(0,Math.sin(t*4.2-0.6)),8);
+  const ry=ang+mx*1.2,rx=-0.15+my*0.5,cy=Math.cos(ry),sy=Math.sin(ry),cx=Math.cos(rx),sx=Math.sin(rx);
+  const sc=Math.min(W,H)/40*beat,pts=[];
+  for(const p of P){
+    let x=p.x*cy+p.z*sy,z=-p.x*sy+p.z*cy,y=p.y*cx-z*sx;z=p.y*sx+z*cx;
+    const f=60/(60+z),px=W/2+x*sc*f,py=H/2+y*sc*f;pts.push([px,py,z,f,p.h]);
+  }
+  pts.sort((a,b)=>b[2]-a[2]);
+  for(const [px,py,z,f,h] of pts){
+    const d=(z+12)/24;                // 0 front .. 1 back (approx)
+    const r=Math.round(255-(1-Math.min(Math.max(d,0),1))*20),g=Math.round(60+d*120),b=Math.round(100+d*80);
+    ctx.fillStyle=`rgba(${r},${g},${b},${0.35+0.6*f*(1-d*.5)})`;
+    ctx.beginPath();ctx.arc(px,py,1.1+f*1.5,0,6.283);ctx.fill();
+  }
+  // orbit rings
+  ctx.lineWidth=1.4;
+  for(let r=0;r<3;r++){
+    ctx.strokeStyle=`rgba(10,165,184,${.35-r*.08})`;ctx.beginPath();
+    ctx.ellipse(W/2,H/2,Math.min(W,H)*(.42+r*.06),Math.min(W,H)*(.12+r*.03),t*.3*(r%2?-1:1)+r,0,6.283);ctx.stroke();
+  }
+  document.getElementById('bpm').textContent=70+Math.round(3*Math.sin(t*1.3));
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script></body></html>
